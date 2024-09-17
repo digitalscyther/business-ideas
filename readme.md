@@ -11,4 +11,5 @@ HOST=0.0.0.0
 PORT=3000
 
 POSTGRES_URL=postgres://postgres:postgres@postgres/ideas
+REDIS_URL=redis://username:password@redis/1
 ```

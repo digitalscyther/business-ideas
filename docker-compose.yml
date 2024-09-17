@@ -38,7 +38,7 @@ services:
   redis:
     image: 'bitnami/redis:latest'
     environment:
-      - ALLOW_EMPTY_PASSWORD=yes
+      - REDIS_PASSWORD=redis123
     volumes:
       - redis_data:/bitnami/redis/data
     networks:

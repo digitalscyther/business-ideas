@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 axum = "0.7.5"
+redis = { version = "0.27.2", features = ["aio", "tokio-comp"] }
 sqlx = { version = "0.8.2", features = ["postgres", "runtime-tokio"] }
 tokio = { version = "1.40.0", features = ["full"] }
 tower-http = { version = "0.5.2", features = ["trace"] }
