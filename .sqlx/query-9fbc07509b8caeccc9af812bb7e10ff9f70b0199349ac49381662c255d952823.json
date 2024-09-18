@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT * FROM short_links WHERE short_key = $1",
+  "query": "SELECT * FROM short_link WHERE short_key = $1",
   "describe": {
     "columns": [
       {
@@ -42,5 +42,5 @@
       false
     ]
   },
-  "hash": "f2f3fc90fd03f151be5dda3c6d9c0529c47434d726fd44fe3107da36afe5f1bc"
+  "hash": "9fbc07509b8caeccc9af812bb7e10ff9f70b0199349ac49381662c255d952823"
 }

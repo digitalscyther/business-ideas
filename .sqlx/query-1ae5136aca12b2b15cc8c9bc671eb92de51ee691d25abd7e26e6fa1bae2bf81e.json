@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "INSERT INTO short_links (short_key, url, token) VALUES ($1, $2, $3) RETURNING *",
+  "query": "INSERT INTO short_link (short_key, url, token) VALUES ($1, $2, $3) RETURNING *",
   "describe": {
     "columns": [
       {
@@ -44,5 +44,5 @@
       false
     ]
   },
-  "hash": "cd48034e8bf5ac16571f34bb977c92b118b9ff12ed4781e1f84b96520ca276f1"
+  "hash": "1ae5136aca12b2b15cc8c9bc671eb92de51ee691d25abd7e26e6fa1bae2bf81e"
 }

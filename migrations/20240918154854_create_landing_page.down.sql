@@ -1,4 +1,4 @@
 -- Add down migration script here
 
 -- Drop the table
-DROP TABLE IF EXISTS short_link;
+DROP TABLE IF EXISTS landing_page;

@@ -1,3 +1,4 @@
+mod landing_page;
 mod short_link;
 mod state;
 mod db;
@@ -20,6 +21,7 @@ async fn main() -> Result<(), String> {
     let router = Router::new()
         .route("/", get(handler))
         .nest("/short-link", short_link::router::get_router(app_state.clone()).await)
+        .nest("/landing-page", landing_page::router::get_router(app_state.clone()).await)
         .layer(TraceLayer::new_for_http());
 
     let host = utils::get_env_var("HOST")?;
