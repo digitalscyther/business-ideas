@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE short_links SET clicks = clicks + 1 WHERE short_key = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "33b7b4def04fc5b48b41da246e901b464d7b4a8c34e28af66fcbbb56af71e972"
+}
