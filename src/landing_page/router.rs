@@ -36,24 +36,6 @@ async fn create_page(
     Ok(Json(CreatePageResponse { success: true }))
 }
 
-// async fn get_page(
-//     Path(path): Path<String>,
-//     State(state): State<Arc<AppState>>,
-// ) -> impl IntoResponse {
-//     match get_landing_page(&state.db, &path).await {
-//         Ok(page) => (
-//             StatusCode::OK,
-//             [(header::CONTENT_TYPE, "text/html")],
-//             String::from_utf8(page.html).unwrap_or_default(),
-//         ),
-//         Err(_) => (
-//             StatusCode::NOT_FOUND,
-//             [(header::CONTENT_TYPE, "text/html")],
-//             "".to_string(),
-//         ),
-//     }
-// }
-
 #[derive(Error, Debug)]
 pub enum AppError {
     // #[error("Invalid input: {0}")]
@@ -66,7 +48,6 @@ pub enum AppError {
     InternalServerError,
 }
 
-// Implement IntoResponse for AppError
 impl IntoResponse for AppError {
     fn into_response(self) -> Response {
         let (status, error_message) = match self {
