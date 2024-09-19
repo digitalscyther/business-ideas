@@ -6,7 +6,7 @@ mod db;
 mod redis;
 mod utils;
 
-use axum::{response::Html, Router, routing::get};
+use axum::{Router, routing::get};
 use tower_http::trace::TraceLayer;
 use tracing::{info, Level};
 
@@ -23,7 +23,7 @@ async fn main() -> Result<(), String> {
         .await.expect("Failed run migrations");
 
     let router = Router::new()
-        .route("/", get(handler))
+        .route("/ping", get(utils::ping_pong))
         .nest("/short-link", short_link::router::get_router(app_state.clone()).await)
         .nest("/landing-page", landing_page::router::get_router(app_state.clone()).await)
         .nest("/contact", message::router::get_router(app_state.clone()).await)
@@ -40,8 +40,4 @@ async fn main() -> Result<(), String> {
     axum::serve(listener, router.into_make_service()).await.expect("Failed start serving");
 
     Ok(())
-}
-
-async fn handler() -> Html<&'static str> {
-    Html("<h1>Hello, World!</h1>")
 }

@@ -10,9 +10,11 @@ use thiserror::Error;
 use tower_http::trace::TraceLayer;
 use crate::db::{create_landing_page, get_landing_page};
 use crate::state::AppState;
+use crate::utils;
 
 pub async fn get_router(app_state: Arc<AppState>) -> Router {
     Router::new()
+        .route("/ping", get(utils::ping_pong))
         .route("/:path", get(get_page))
         .route("/:path", post(create_page))
         .layer(TraceLayer::new_for_http())

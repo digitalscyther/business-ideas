@@ -12,9 +12,11 @@ use sqlx::types::Uuid;
 use tower_http::trace::TraceLayer;
 use crate::db::{create_topic, get_topic, create_message, get_messages, Message};
 use crate::state::AppState;
+use crate::utils;
 
 pub async fn get_router(app_state: Arc<AppState>) -> Router {
     Router::new()
+        .route("/ping", get(utils::ping_pong))
         .route("/topics", post(create_topic_handler))
         .route("/messages", post(create_message_handler))
         .route("/topics/:topic_id/messages", get(get_messages_handler))

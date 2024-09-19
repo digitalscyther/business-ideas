@@ -9,9 +9,11 @@ use tower_http::trace::TraceLayer;
 use crate::db::{check_key_exists, create_short_link, get_short_link, increment_short_link_clicks, ShortLink};
 use crate::short_link::link::{generate_key, rand_string};
 use crate::state::AppState;
+use crate::utils;
 
 pub async fn get_router(app_state: Arc<AppState>) -> Router {
     Router::new()
+        .route("/ping", get(utils::ping_pong))
         .route("/gen", post(create_link))
         .route("/:short_key", get(proxy))
         .route("/:short_key/info", get(get_link))
