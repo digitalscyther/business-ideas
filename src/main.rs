@@ -17,6 +17,9 @@ async fn main() -> Result<(), String> {
         .init();
 
     let app_state = state::setup_app_state().await.expect("Failed to build AppState");
+    sqlx::migrate!("./migrations")
+        .run(&app_state.db)
+        .await.expect("Failed run migrations");
 
     let router = Router::new()
         .route("/", get(handler))
