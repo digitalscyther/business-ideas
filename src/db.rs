@@ -1,5 +1,6 @@
 use serde::Serialize;
 use sqlx::PgPool;
+use sqlx::types::{Uuid, chrono::NaiveDateTime};
 
 pub async fn get_db_connection(db_url: &str) -> Result<PgPool, sqlx::Error> {
     PgPool::connect(db_url).await
@@ -83,4 +84,60 @@ pub async fn get_landing_page(db: &PgPool, path: &str) -> Result<LandingPage, sq
         )
         .fetch_one(db)
         .await
+}
+
+
+#[derive(Serialize, sqlx::FromRow)]
+pub struct Topic {
+    pub id: Uuid,
+    pub name: String,
+}
+
+#[derive(Serialize, sqlx::FromRow)]
+pub struct Message {
+    pub id: i32,
+    pub created_at: NaiveDateTime,
+    pub email: String,
+    pub text: String,
+    pub topic_id: Uuid,
+}
+
+pub async fn create_topic(db: &PgPool, name: &str) -> Result<Topic, sqlx::Error> {
+    sqlx::query_as!(
+        Topic,
+        "INSERT INTO topic (name) VALUES ($1) RETURNING *",
+        name
+    )
+    .fetch_one(db)
+    .await
+}
+
+pub async fn get_topic(db: &PgPool, topic_id: &Uuid) -> Result<Option<Topic>, sqlx::Error> {
+    sqlx::query_as!(
+        Topic,
+        "SELECT * FROM topic WHERE id = $1",
+        topic_id
+    )
+    .fetch_optional(db)
+    .await
+}
+
+pub async fn create_message(db: &PgPool, email: &str, text: &str, topic_id: &Uuid) -> Result<Message, sqlx::Error> {
+    sqlx::query_as!(
+        Message,
+        "INSERT INTO message (email, text, topic_id) VALUES ($1, $2, $3) RETURNING *",
+        email,
+        text,
+        topic_id
+    )
+    .fetch_one(db)
+    .await
+}
+
+pub async fn get_messages(db: &PgPool, topic_id: &Uuid) -> Result<Vec<Message>, sqlx::Error> {
+    sqlx::query_as!(
+        Message, "SELECT * FROM message WHERE topic_id = $1 ORDER BY created_at DESC", topic_id
+    )
+    .fetch_all(db)
+    .await
 }
