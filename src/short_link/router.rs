@@ -12,9 +12,9 @@ use crate::state::AppState;
 
 pub async fn get_router(app_state: Arc<AppState>) -> Router {
     Router::new()
+        .route("/gen", post(create_link))
         .route("/:short_key", get(proxy))
         .route("/:short_key/info", get(get_link))
-        .route("/", post(create_link))
         .layer(TraceLayer::new_for_http())
         .with_state(app_state)
 }
