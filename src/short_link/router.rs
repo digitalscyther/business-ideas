@@ -9,7 +9,6 @@ use tower_http::trace::TraceLayer;
 use crate::db::{check_key_exists, create_short_link, get_short_link, increment_short_link_clicks, ShortLink};
 use crate::short_link::link::{generate_key, rand_string};
 use crate::state::AppState;
-use crate::utils;
 
 pub async fn get_router(app_state: Arc<AppState>) -> Router {
     Router::new()
@@ -41,8 +40,7 @@ async fn create_link(
     Host(hostname): Host,
     Json(payload): Json<CreateLinkRequest>,
 ) -> Result<Json<CreateShortLinkResponse>, StatusCode> {
-    let scheme = utils::get_env_var("LINK_SCHEME")
-        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    let scheme = std::env::var("LINK_SCHEME").unwrap_or_else(|_| "http".to_string());
 
     let short_key = generate_key(
         | key| {
