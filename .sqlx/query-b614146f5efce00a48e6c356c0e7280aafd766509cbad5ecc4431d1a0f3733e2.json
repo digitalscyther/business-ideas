@@ -15,18 +15,18 @@
       },
       {
         "ordinal": 2,
-        "name": "email",
-        "type_info": "Varchar"
-      },
-      {
-        "ordinal": 3,
         "name": "text",
         "type_info": "Text"
       },
       {
-        "ordinal": 4,
+        "ordinal": 3,
         "name": "topic_id",
         "type_info": "Uuid"
+      },
+      {
+        "ordinal": 4,
+        "name": "contacts",
+        "type_info": "Jsonb"
       }
     ],
     "parameters": {

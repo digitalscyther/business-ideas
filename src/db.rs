@@ -97,7 +97,7 @@ pub struct Topic {
 pub struct Message {
     pub id: i32,
     pub created_at: NaiveDateTime,
-    pub email: String,
+    pub contacts: serde_json::Value,
     pub text: String,
     pub topic_id: Uuid,
 }
@@ -122,11 +122,11 @@ pub async fn get_topic(db: &PgPool, topic_id: &Uuid) -> Result<Option<Topic>, sq
     .await
 }
 
-pub async fn create_message(db: &PgPool, email: &str, text: &str, topic_id: &Uuid) -> Result<Message, sqlx::Error> {
+pub async fn create_message(db: &PgPool, contacts: &serde_json::Value, text: &str, topic_id: &Uuid) -> Result<Message, sqlx::Error> {
     sqlx::query_as!(
         Message,
-        "INSERT INTO message (email, text, topic_id) VALUES ($1, $2, $3) RETURNING *",
-        email,
+        "INSERT INTO message (contacts, text, topic_id) VALUES ($1::jsonb, $2, $3) RETURNING *",
+        contacts,
         text,
         topic_id
     )

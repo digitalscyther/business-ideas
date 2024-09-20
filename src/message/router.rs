@@ -1,3 +1,4 @@
+use std::fmt::Debug;
 use std::sync::Arc;
 use axum::extract::{Path, State};
 use axum::http::StatusCode;
@@ -10,6 +11,7 @@ use axum_extra::{
 use serde::{Deserialize, Serialize};
 use sqlx::types::Uuid;
 use tower_http::trace::TraceLayer;
+use tracing::error;
 use crate::db::{create_topic, get_topic, create_message, get_messages, Message};
 use crate::state::AppState;
 use crate::utils;
@@ -18,7 +20,7 @@ pub async fn get_router(app_state: Arc<AppState>) -> Router {
     Router::new()
         .route("/ping", get(utils::ping_pong))
         .route("/topics", post(create_topic_handler))
-        .route("/messages", post(create_message_handler))
+        .route("/topics/:topic_id/messages", post(create_message_handler))
         .route("/topics/:topic_id/messages", get(get_messages_handler))
         .layer(TraceLayer::new_for_http())
         .with_state(app_state)
@@ -36,9 +38,8 @@ struct CreateTopicResponse {
 
 #[derive(Deserialize)]
 struct CreateMessageRequest {
-    email: String,
+    contacts: serde_json::Value,
     text: String,
-    topic_id: Uuid,
 }
 
 async fn create_topic_handler(
@@ -53,10 +54,11 @@ async fn create_topic_handler(
 }
 
 async fn create_message_handler(
+    Path(topic_id): Path<Uuid>,
     State(state): State<Arc<AppState>>,
     Json(payload): Json<CreateMessageRequest>,
 ) -> Result<StatusCode, StatusCode> {
-    let topic_exists = get_topic(&state.db, &payload.topic_id)
+    let topic_exists = get_topic(&state.db, &topic_id)
         .await
         .map_err(|_| StatusCode::NOT_FOUND)?;
 
@@ -64,11 +66,16 @@ async fn create_message_handler(
         return Err(StatusCode::NOT_FOUND);
     }
 
-    create_message(&state.db, &payload.email, &payload.text, &payload.topic_id)
+    create_message(&state.db, &payload.contacts, &payload.text, &topic_id)
         .await
-        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+        .map_err(|err| log_and_raise("Failed create_message", err))?;
 
     Ok(StatusCode::CREATED)
+}
+
+fn log_and_raise(pre_message: &str, err: impl Debug) -> StatusCode {
+    error!("{}: {:?}", pre_message, err);
+    StatusCode::INTERNAL_SERVER_ERROR
 }
 
 async fn get_messages_handler(
