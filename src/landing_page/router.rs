@@ -70,14 +70,22 @@ async fn get_page(
     Path(path): Path<String>,
     State(state): State<Arc<AppState>>,
 ) -> Result<impl IntoResponse, AppError> {
-    if let Ok(page) = get_landing_page(&state.db, &path).await {
-        return Ok((
-            StatusCode::OK,
-            [(header::CONTENT_TYPE, "text/html")],
-            String::from_utf8(page.html).map_err(|_| AppError::InternalServerError)?,
-        ));
+    match get_landing_page(&state.db, &path).await {
+        Ok(page) => {
+            Ok((
+                StatusCode::OK,
+                [(header::CONTENT_TYPE, "text/html")],
+                String::from_utf8(page.html).map_err(|_| AppError::InternalServerError)?,
+            ))
+        }
+        Err(sqlx::Error::RowNotFound) => {
+            Ok((
+                StatusCode::NOT_FOUND,
+                [(header::CONTENT_TYPE, "text/plain")],
+                "Page not found".into(),
+            ))
+        }
+        Err(_) => Err(AppError::InternalServerError),
     }
-
-    Err(AppError::InternalServerError)
 }
 
