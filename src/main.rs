@@ -7,6 +7,7 @@ mod redis;
 mod utils;
 
 use axum::{Router, routing::get};
+use tower_http::cors::{Any, CorsLayer};
 use tower_http::trace::TraceLayer;
 use tracing::{info, Level};
 
@@ -22,11 +23,17 @@ async fn main() -> Result<(), String> {
         .run(&app_state.db)
         .await.expect("Failed run migrations");
 
+    let cors = CorsLayer::new()
+        .allow_origin(Any)
+        .allow_methods(Any)
+        .allow_headers(Any);
+
     let router = Router::new()
         .route("/ping", get(utils::ping_pong))
         .nest("/short-link", short_link::router::get_router(app_state.clone()).await)
         .nest("/landing-page", landing_page::router::get_router(app_state.clone()).await)
         .nest("/contact", message::router::get_router(app_state.clone()).await)
+        .layer(cors)
         .layer(TraceLayer::new_for_http());
 
     let host = utils::get_env_var("HOST")?;
