@@ -70,12 +70,18 @@ pub struct LandingPage {
 pub async fn create_landing_page(db: &PgPool, path: &str, html: Vec<u8>) -> Result<LandingPage, sqlx::Error> {
     sqlx::query_as!(
         LandingPage,
-        "INSERT INTO landing_page (path, html) VALUES ($1, $2) RETURNING *",
+        r#"
+        INSERT INTO landing_page (path, html)
+        VALUES ($1, $2)
+        ON CONFLICT (path)
+        DO UPDATE SET html = EXCLUDED.html
+        RETURNING *
+        "#,
         path,
         html
     )
-        .fetch_one(db)
-        .await
+    .fetch_one(db)
+    .await
 }
 
 pub async fn get_landing_page(db: &PgPool, path: &str) -> Result<LandingPage, sqlx::Error> {
